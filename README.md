@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Real-Time Transmission Line Fault Detection and Classification using an Artificial Neural Network
 
 **Department of Electrical and Electronics Engineering, NIT Puducherry**  
@@ -109,3 +110,7 @@ When evaluating the Kaggle dataset on all 6 original classes, the baseline ANN a
 - Demonstrate the **3-Phase Oscilloscope** and **Polar Phasor Diagram**.
 - Show how the circuit breaker trips in under **12 ms** and isolates the faulted section.
 - Summarize the project conclusions and future scope (1D-CNN / LSTM and edge microcontrollers).
+=======
+# Fault-detection-in-Power-system-using-ANN
+eal-time transmission line fault detection and classification using an ANN and MongoDB.
+>>>>>>> a0d2aeb7ad14b0b1d38ece6d915ac4cd87de35cb
