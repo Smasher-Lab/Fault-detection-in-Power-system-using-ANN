@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Transmission Line Fault Detection & Classification | Soft Computing | NIT Puducherry</title>
+    <!-- Tailwind CSS CDN for modern responsive grid -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+    <!-- Top Executive Header -->
+    <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-50 py-2.5 px-4 sm:px-6">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+            <!-- Left Branding -->
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-md shadow-sky-500/20 text-lg">
+                    ⚡
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="brand-badge text-[10px] py-0.5 px-2">NIT Puducherry • Dept. of EEE</span>
+                        <span class="text-[11px] text-slate-400 font-medium">Soft Computing Assignment</span>
+                    </div>
+                    <h1 class="text-sm sm:text-base font-bold tracking-tight text-white leading-tight">
+                        Real-Time Transmission Line Fault Detection & Classification using ANN
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Team Members & Status -->
+            <div class="flex items-center flex-wrap gap-2 text-xs">
+                <div class="team-pill py-1 px-2.5" title="EE24B1030">
+                    <span class="text-sky-400">👤</span>
+                    <span>Lalith <strong>EE24B1030</strong></span>
+                </div>
+                <div class="team-pill py-1 px-2.5" title="EE24B1041">
+                    <span class="text-amber-400">👤</span>
+                    <span>Prabhat <strong>EE24B1041</strong></span>
+                </div>
+                <div class="team-pill py-1 px-2.5" title="EE24B1040">
+                    <span class="text-emerald-400">👤</span>
+                    <span>Vamsi <strong>EE24B1040</strong></span>
+                </div>
+                <div id="db-status-badge" class="status-pill client-only py-1 px-2.5">
+                    ● AI Engine: Standalone Ready
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs Bar -->
+        <div class="max-w-7xl mx-auto mt-2.5 pt-2 border-t border-slate-800/60 flex items-center justify-between overflow-x-auto">
+            <nav class="flex items-center gap-1.5">
+                <button class="nav-tab-btn active text-xs py-1.5 px-3" data-tab="tab-predictor" onclick="switchTab('tab-predictor')">
+                    <span>⚡</span> <span>Live Fault Studio (Main Demo)</span>
+                </button>
+                <button class="nav-tab-btn text-xs py-1.5 px-3" data-tab="tab-confusion" onclick="switchTab('tab-confusion')">
+                    <span>🎯</span> <span>Confusion Matrix & Model Performance</span>
+                </button>
+                <button class="nav-tab-btn text-xs py-1.5 px-3" data-tab="tab-streaming" onclick="switchTab('tab-streaming')">
+                    <span>📡</span> <span>SCADA Telemetry & MongoDB Stream</span>
+                </button>
+                <button class="nav-tab-btn text-xs py-1.5 px-3" data-tab="tab-slides" onclick="switchTab('tab-slides')">
+                    <span>🎓</span> <span>Classroom Presentation Slides</span>
+                </button>
+                <button class="nav-tab-btn text-xs py-1.5 px-3" data-tab="tab-proposal" onclick="switchTab('tab-proposal')">
+                    <span>📑</span> <span>Project Proposal Specs</span>
+                </button>
+            </nav>
+            <div class="text-[11px] text-slate-400 hidden lg:block font-mono">
+                Multilayer Perceptron (MLP) • ReLU & Softmax
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Viewport Container -->
+    <main class="max-w-7xl mx-auto p-3 sm:p-5">
+
+        <!-- ======================================================== -->
+        <!-- TAB 1: LIVE FAULT STUDIO (SPACIOUS & SCROLLABLE LAYOUT)   -->
+        <!-- ======================================================== -->
+        <section id="tab-predictor" class="tab-section space-y-6 sm:space-y-8">
+            
+            <!-- TOP MISSION CONTROL HERO BAR -->
+            <div class="clean-card border-l-4 border-sky-500 p-4 sm:p-5">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    
+                    <!-- Left: Actual vs Predicted Live Verdict -->
+                    <div class="flex flex-wrap items-center gap-4 sm:gap-8 flex-1">
+                        <!-- Actual Ground Truth -->
+                        <div class="space-y-1">
+                            <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">
+                                1. Actual Ground Truth (<span id="actual-source-badge" class="text-sky-400">Preset Standard</span>)
+                            </span>
+                            <div id="actual-fault-type" class="text-lg sm:text-xl font-extrabold text-white">
+                                LG (A-G)
+                            </div>
+                            <div id="actual-fault-desc" class="text-xs text-slate-400 truncate max-w-[260px]">
+                                Single Line-to-Ground on Phase A
+                            </div>
+                        </div>
+
+                        <!-- Forward Propagation Arrow -->
+                        <div class="flex flex-col items-center justify-center text-sky-400 font-bold px-2">
+                            <span class="text-xl">➔</span>
+                            <span class="text-[10px] text-slate-400 font-mono">0.45ms</span>
+                        </div>
+
+                        <!-- ANN Prediction -->
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                                    2. ANN Diagnosis
+                                </span>
+                                <span id="result-confidence" class="text-amber-400 font-mono font-bold text-xs">99.8% Conf</span>
+                            </div>
+                            <div id="result-fault-type" class="text-lg sm:text-xl font-extrabold text-rose-400 flex items-center gap-1.5">
+                                LG (A-G)
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span id="validation-match-badge" class="badge badge-green text-[10px] font-bold py-0.5 px-2">
+                                    ✔ ACCURATE MATCH
+                                </span>
+                                <span id="result-latency" class="text-slate-400 font-mono text-[11px]">0.45 ms</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Model Selector directly in Main Hero -->
+                        <div class="space-y-1 border-t sm:border-t-0 sm:border-l border-slate-800 pt-2 sm:pt-0 sm:pl-4">
+                            <span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold block">
+                                3. Model Architecture
+                            </span>
+                            <select onchange="switchModel(this.value)" class="model-select-input bg-slate-900 border border-slate-700 text-sky-300 rounded px-2.5 py-1 text-xs font-bold focus:outline-none focus:border-sky-500">
+                                <option value="baseline" selected>Baseline 6-Class MLP (85.19%)</option>
+                                <option value="protective_standard">IEEE 5-Class Relay (99.55% ★ Recommended)</option>
+                                <option value="enhanced">Enhanced Deep MLP (85.00%)</option>
+                            </select>
+                            <div class="text-[10px] text-slate-400 font-mono">Instant model comparison</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Substation Breaker & Quick Action Buttons -->
+                    <div class="flex flex-wrap items-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-800 pt-3 lg:pt-0 lg:pl-6">
+                        <!-- Circuit Breaker Status -->
+                        <div id="transmission-grid-card" class="flex items-center gap-3 bg-slate-900/90 py-2 px-3.5 rounded-xl border border-slate-800">
+                            <div class="relative w-9 h-9 bg-slate-950 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <span class="text-lg">⚡</span>
+                                <div id="grid-arc-effect" class="arc-flash" style="display:none; top: 0px; left: 8px;"></div>
+                            </div>
+                            <div>
+                                <div id="grid-breaker-status" class="breaker-badge breaker-tripped py-0.5 px-2.5 text-xs">
+                                    <span class="status-dot red"></span> CB: TRIPPED
+                                </div>
+                                <div id="grid-fault-text" class="text-[11px] text-slate-300 mt-0.5">
+                                    Trip command: <span class="text-amber font-mono font-bold">11.8 ms</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Trigger Actions -->
+                        <div class="flex items-center gap-2">
+                            <button id="btn-check-fault" onclick="checkFaultNow()" class="btn-primary py-2.5 px-4 font-bold text-xs flex items-center gap-2 shadow-lg shadow-sky-500/25">
+                                <span>⚡</span> Check Fault
+                            </button>
+                            <button id="btn-trigger-anim" onclick="checkFaultNow()" class="btn-secondary py-2.5 px-3 font-semibold text-xs flex items-center gap-1.5" title="Play animated forward propagation pulse">
+                                <span>▶</span> Pulse
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- SECTION 1: SENSOR INPUTS (LEFT) & NEURAL NETWORK FORWARD PASS (RIGHT) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+                <!-- LEFT COLUMN (5 cols): INPUT CONTROLS & TELEMETRY -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <!-- 1. Quick Presets Card -->
+                    <div class="clean-card p-5 space-y-3.5">
+                        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                            <div class="clean-title text-sm">
+                                <span>⚡</span> 1-Click Fault Presets
+                            </div>
+                            <span class="text-[11px] text-sky-400 font-mono">Standard Transmission Cases</span>
+                        </div>
+                        
+                        <!-- 6 Preset Buttons (2 cols x 3 rows) -->
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <button id="preset-healthy" onclick="applyPreset('healthy')" class="preset-btn p-3">
+                                <span class="text-emerald-400 font-bold text-base">🟢</span>
+                                <div>
+                                    <div class="font-bold text-emerald-400">Normal</div>
+                                    <div class="text-[10px] text-slate-400">Healthy Line (No Fault)</div>
+                                </div>
+                            </button>
+                            <button id="preset-lg" onclick="applyPreset('lg')" class="preset-btn active-preset p-3">
+                                <span class="text-rose-400 font-bold text-base">🔴</span>
+                                <div>
+                                    <div class="font-bold text-rose-400">LG Fault</div>
+                                    <div class="text-[10px] text-slate-400">Phase A-Ground (70% freq)</div>
+                                </div>
+                            </button>
+                            <button id="preset-ll" onclick="applyPreset('ll')" class="preset-btn p-3">
+                                <span class="text-amber-400 font-bold text-base">🟠</span>
+                                <div>
+                                    <div class="font-bold text-amber-400">LL Fault</div>
+                                    <div class="text-[10px] text-slate-400">Phase B-Phase C (15%)</div>
+                                </div>
+                            </button>
+                            <button id="preset-llg" onclick="applyPreset('llg')" class="preset-btn p-3">
+                                <span class="text-purple-400 font-bold text-base">🟣</span>
+                                <div>
+                                    <div class="font-bold text-purple-400">LLG Fault</div>
+                                    <div class="text-[10px] text-slate-400">Phase A-B-Ground (10%)</div>
+                                </div>
+                            </button>
+                            <button id="preset-lll" onclick="applyPreset('lll')" class="preset-btn p-3">
+                                <span class="text-sky-400 font-bold text-base">🔵</span>
+                                <div>
+                                    <div class="font-bold text-sky-400">LLL Fault</div>
+                                    <div class="text-[10px] text-slate-400">3-Phase Symmetrical (5%)</div>
+                                </div>
+                            </button>
+                            <button id="preset-lllg" onclick="applyPreset('lllg')" class="preset-btn p-3">
+                                <span class="text-pink-400 font-bold text-base">⚪</span>
+                                <div>
+                                    <div class="font-bold text-pink-400">LLLG Fault</div>
+                                    <div class="text-[10px] text-slate-400">3-Phase with Ground</div>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Real Kaggle Test Dataset Row Picker -->
+                        <div class="pt-3 border-t border-slate-800/80 space-y-2">
+                            <div class="flex items-center justify-between text-xs text-slate-300">
+                                <span class="font-semibold">Pick Kaggle Test Row (Actual Label):</span>
+                                <span class="text-sky-400 font-mono text-[11px]">classData.csv</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <select id="kaggle-sample-select" onchange="loadSampleByIndex(this.value)" class="flex-1 bg-slate-900 border border-slate-700 text-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold focus:outline-none focus:border-sky-500">
+                                    <option value="0">Row #0: LG (Phase A-G)</option>
+                                    <option value="1">Row #1: LL (Phase B-C)</option>
+                                    <option value="2">Row #2: LLG (Phase A-B-G)</option>
+                                    <option value="3">Row #3: LLL (3-Phase Symmetrical)</option>
+                                    <option value="4">Row #4: LLLG (3-Phase with Ground)</option>
+                                    <option value="5">Row #5: Normal Balanced (Healthy)</option>
+                                </select>
+                                <button id="btn-random-sample" onclick="loadRandomSample()" class="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1.5" title="Cycle random test sample">
+                                    <span>🎲</span> Random
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. 3-Phase Telemetry Sliders -->
+                    <div class="clean-card p-5 space-y-3.5">
+                        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                            <div class="clean-title text-sm">
+                                <span>📈</span> 3-Phase Currents & Voltages
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button id="btn-save-mongo" onclick="saveCurrentReadingToMongo()" class="btn-xs btn-outline font-bold text-xs py-1 px-2.5 flex items-center gap-1 text-emerald-400 border-emerald-500/50 hover:bg-emerald-950/40" title="Saves current slider readings directly into MongoDB fault_db.readings">
+                                    <span>💾</span> Log to MongoDB
+                                </button>
+                                <button onclick="injectCurrentSurge()" class="btn-xs btn-outline font-bold text-xs py-1 px-2.5 flex items-center gap-1" title="Injects -500A surge onto Phase A">
+                                    <span>⚡</span> Surge Phase A
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Current Variation Alert Badge -->
+                        <div id="current-state-indicator" class="text-xs font-bold text-rose-400 bg-slate-900/90 py-1.5 px-3 rounded-lg border border-slate-800">
+                            Phase A Fault Surge Active (-650 A)
+                        </div>
+
+                        <!-- 3-Phase Currents (Ia, Ib, Ic) -->
+                        <div class="space-y-2 pt-1">
+                            <div class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Line Currents (±1000 A)</div>
+                            
+                            <!-- Ia -->
+                            <div class="slider-compact">
+                                <div class="flex justify-between items-center text-xs mb-1">
+                                    <span class="font-bold text-rose-400 flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Ia (Phase A)
+                                    </span>
+                                    <input type="number" id="input-Ia" value="-650.4" step="1" class="text-xs font-mono">
+                                </div>
+                                <input type="range" id="slider-Ia" min="-1000" max="1000" step="1" value="-650.4">
+                            </div>
+
+                            <!-- Ib -->
+                            <div class="slider-compact">
+                                <div class="flex justify-between items-center text-xs mb-1">
+                                    <span class="font-bold text-yellow-400 flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-500 inline-block"></span> Ib (Phase B)
+                                    </span>
+                                    <input type="number" id="input-Ib" value="-45.2" step="1" class="text-xs font-mono">
+                                </div>
+                                <input type="range" id="slider-Ib" min="-1000" max="1000" step="1" value="-45.2">
+                            </div>
+
+                            <!-- Ic -->
+                            <div class="slider-compact">
+                                <div class="flex justify-between items-center text-xs mb-1">
+                                    <span class="font-bold text-sky-400 flex items-center gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span> Ic (Phase C)
+                                    </span>
+                                    <input type="number" id="input-Ic" value="18.5" step="1" class="text-xs font-mono">
+                                </div>
+                                <input type="range" id="slider-Ic" min="-1000" max="1000" step="1" value="18.5">
+                            </div>
+                        </div>
+
+                        <!-- 3-Phase Voltages (Va, Vb, Vc) -->
+                        <div class="pt-3 border-t border-slate-800/80 space-y-2">
+                            <div class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Line Voltages (±0.8 p.u.)</div>
+                            <div class="grid grid-cols-3 gap-2">
+                                <!-- Va -->
+                                <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                    <div class="flex justify-between text-xs text-rose-400 font-bold mb-1">
+                                        <span>Va</span>
+                                        <input type="number" id="input-Va" value="0.14" step="0.01" class="w-12 text-xs py-0 font-mono">
+                                    </div>
+                                    <input type="range" id="slider-Va" min="-0.8" max="0.8" step="0.01" value="0.14">
+                                </div>
+                                <!-- Vb -->
+                                <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                    <div class="flex justify-between text-xs text-yellow-400 font-bold mb-1">
+                                        <span>Vb</span>
+                                        <input type="number" id="input-Vb" value="-0.01" step="0.01" class="w-12 text-xs py-0 font-mono">
+                                    </div>
+                                    <input type="range" id="slider-Vb" min="-0.8" max="0.8" step="0.01" value="-0.01">
+                                </div>
+                                <!-- Vc -->
+                                <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                    <div class="flex justify-between text-xs text-sky-400 font-bold mb-1">
+                                        <span>Vc</span>
+                                        <input type="number" id="input-Vc" value="-0.15" step="0.01" class="w-12 text-xs py-0 font-mono">
+                                    </div>
+                                    <input type="range" id="slider-Vc" min="-0.8" max="0.8" step="0.01" value="-0.15">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN (7 cols): ANIMATED NEURAL NETWORK CANVAS & MATH STEPPER -->
+                <div class="lg:col-span-7 space-y-6">
+                    
+                    <!-- Neural Network Canvas Card -->
+                    <div class="clean-card p-5 space-y-3 relative">
+                        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+                            <div>
+                                <div class="clean-title text-sm">
+                                    <span>🧠</span> Neural Network Signal Flow
+                                </div>
+                                <div class="text-xs text-slate-400 font-mono mt-0.5">
+                                    MLP Architecture: 6 In ➔ 32 Hidden 1 ➔ 16 Hidden 2 ➔ Softmax Output
+                                </div>
+                            </div>
+                            <button onclick="checkFaultNow()" class="btn-primary py-1.5 px-3 text-xs font-bold flex items-center gap-1.5">
+                                <span>▶</span> Pulse Signal
+                            </button>
+                        </div>
+
+                        <!-- Canvas container -->
+                        <div class="relative bg-slate-950/95 rounded-xl overflow-hidden border border-slate-800 shadow-xl">
+                            <canvas id="nn-canvas"></canvas>
+                        </div>
+
+                        <!-- Hover Tooltip -->
+                        <div id="nn-tooltip" style="opacity: 0;"></div>
+                    </div>
+
+                    <!-- Mathematical Forward Pass Step-by-Step Flow -->
+                    <div class="clean-card p-5 space-y-3">
+                        <div class="clean-title text-xs text-slate-300">
+                            <span>🔢</span> Forward Pass Math: "How the Prediction Happened"
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+                                <div class="font-bold text-sky-400 text-xs mb-1">1. StandardScaler (Z-Score)</div>
+                                <div id="math-step-1" class="text-slate-300 font-mono text-[11px] leading-relaxed"></div>
+                            </div>
+                            <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+                                <div class="font-bold text-emerald-400 text-xs mb-1">2. Hidden 1 (32 ReLU Filter)</div>
+                                <div id="math-step-2" class="text-slate-300 text-[11px] leading-relaxed"></div>
+                            </div>
+                            <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+                                <div class="font-bold text-indigo-400 text-xs mb-1">3. Hidden 2 (16 Pattern Associator)</div>
+                                <div id="math-step-3" class="text-slate-300 text-[11px] leading-relaxed"></div>
+                            </div>
+                            <div class="bg-slate-900/90 p-3 rounded-lg border border-slate-800">
+                                <div class="font-bold text-amber-400 text-xs mb-1">4. Softmax Probability Output</div>
+                                <div id="math-step-4" class="text-slate-300 text-[11px] leading-relaxed"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- SECTION 2: PROMINENT THREE-PHASE AC WAVEFORMS & POLAR PHASOR ANALYZER (BOTH VISIBLE & HIGHLIGHTED) -->
+            <div class="analyzer-card space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+                    <div>
+                        <div class="text-base font-bold text-white flex items-center gap-2">
+                            <span>🌊</span> Three-Phase AC Waveform & Polar Phasor Analyzer
+                        </div>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Real-time 50 Hz sinusoidal waveforms and polar vector balance showing instantaneous line surges and phase angle shifts.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-400 font-semibold">Scope Mode:</span>
+                        <button id="btn-scope-current" class="tab-pill active text-xs py-1 px-3">
+                            ⚡ Current Waveforms (Ia, Ib, Ic)
+                        </button>
+                        <button id="btn-scope-voltage" class="tab-pill text-xs py-1 px-3">
+                            🔌 Voltage Waveforms (Va, Vb, Vc)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2-Column Grid: Sine Waves (Left 8 cols) + Phasor Star (Right 4 cols) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                    
+                    <!-- 1. Oscilloscope Sine Waves Box -->
+                    <div class="lg:col-span-8 flex flex-col justify-between space-y-3">
+                        <div class="scope-canvas-box">
+                            <canvas id="scope-canvas"></canvas>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-between text-xs text-slate-400 px-1 gap-2">
+                            <div class="flex items-center gap-3">
+                                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500 shadow-md shadow-rose-500/50"></span> Phase A</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-yellow-500 shadow-md shadow-yellow-500/50"></span> Phase B</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-sky-500 shadow-md shadow-sky-500/50"></span> Phase C</span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/50"></span> Neutral (In)</span>
+                            </div>
+                            <span class="font-mono text-[11px] text-slate-400">Time Scale: 50 Hz Grid (20 ms / cycle)</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Polar Phasor Star Box -->
+                    <div class="lg:col-span-4 flex flex-col justify-between space-y-3 bg-slate-950/70 p-4 rounded-xl border border-slate-800">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-sky-400 uppercase tracking-wider">🧭 Polar Phasor Star</span>
+                            <span class="text-[10px] text-slate-400 font-mono">120° Balanced Star</span>
+                        </div>
+                        
+                        <div class="phasor-canvas-box p-2">
+                            <canvas id="phasor-canvas"></canvas>
+                        </div>
+
+                        <!-- Live Unbalance Diagnosis Badge -->
+                        <div id="phasor-balance-status" class="text-xs text-center font-mono py-1.5 px-3 rounded-lg bg-slate-900/90 border border-slate-800">
+                            <span class="text-emerald-400 font-semibold">✔ Symmetrical 3-Phase Balance (In ≈ 0)</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- TAB 2: DEDICATED CONFUSION MATRIX & MODEL EVALUATION     -->
+        <!-- ======================================================== -->
+        <section id="tab-confusion" class="tab-section hidden space-y-6 sm:space-y-8">
+            
+            <!-- Executive Header Card -->
+            <div class="clean-card border-l-4 border-indigo-500 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="brand-badge text-[10px] mb-1">Model Evaluation & Benchmark</div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+                        <span>🎯</span> ANN Classification Performance & Confusion Matrix
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Rigorous evaluation on 1,573 Kaggle test samples (20% holdout split) across all transmission line fault classes.
+                    </p>
+                </div>
+                
+                <!-- Model Switcher Dropdown right in header -->
+                <div class="flex items-center gap-2 bg-slate-900/90 p-2.5 rounded-lg border border-slate-700/80">
+                    <span class="text-xs text-slate-300 font-semibold whitespace-nowrap">Active Model:</span>
+                    <select id="model-select" onchange="switchModel(this.value)" class="model-select-input bg-slate-950 border border-slate-700 text-slate-200 text-xs rounded px-2.5 py-1.5 font-bold focus:outline-none focus:border-sky-500">
+                        <option value="protective_standard">IEEE 5-Class Protective Relay (99.55% ★ Recommended)</option>
+                        <option value="baseline">Baseline 6-Class MLP (Current Proposal - 85.19%)</option>
+                        <option value="enhanced">Enhanced Deep MLP (85.00%)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 2-Column Spacious Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                
+                <!-- Left Column (7 cols): Full Confusion Matrix Card -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="clean-card p-5 sm:p-6 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                            <div>
+                                <div class="clean-title text-sky-400 text-sm">
+                                    <span>🎯</span> Interactive Confusion Matrix (1,573 Test Samples)
+                                </div>
+                                <p class="text-xs text-slate-400 mt-0.5">
+                                    Live cell pulses with glowing amber ring on the active test sample.
+                                </p>
+                            </div>
+                            <button onclick="loadRandomSample(); switchTab('tab-confusion');" class="btn-secondary text-xs py-1 px-3 flex items-center gap-1.5" title="Test a random sample to watch its cell highlight">
+                                <span>🎲</span> Test Live Sample in Matrix
+                            </button>
+                        </div>
+
+                        <!-- Heatmap Table Container -->
+                        <div id="confusion-matrix-container" class="mt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Right Column (5 cols): Benchmark Comparison, Conductor Accuracies & Physics Deep Dive -->
+                <div class="lg:col-span-5 space-y-6">
+                    
+                    <!-- Model Benchmark Table Card -->
+                    <div class="clean-card p-5 space-y-3">
+                        <div class="clean-title text-indigo-400 text-sm">
+                            <span>📊</span> Model Benchmark Comparison
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs border-collapse font-mono">
+                                <thead>
+                                    <tr class="border-b border-slate-800 text-slate-400 font-semibold text-[11px]">
+                                        <th class="py-2 px-3">Architecture</th>
+                                        <th class="py-2 px-3">Accuracy</th>
+                                        <th class="py-2 px-3">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="model-comparison-tbody">
+                                    <!-- Populated dynamically by renderPerformanceTable -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Conductor Identification Accuracies Card -->
+                    <div class="clean-card p-5 space-y-3">
+                        <div class="clean-title text-emerald-400 text-sm">
+                            <span>🔍</span> Multi-Head Conductor Localization Accuracies
+                        </div>
+                        <p class="text-xs text-slate-400">
+                            Independent binary classification heads predicting fault involvement per wire:
+                        </p>
+                        <div class="grid grid-cols-4 gap-2 text-center text-xs font-mono">
+                            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-rose-400 font-bold text-[11px]">Phase A</div>
+                                <div class="text-emerald-400 font-extrabold text-sm mt-0.5">99.8%</div>
+                            </div>
+                            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-yellow-400 font-bold text-[11px]">Phase B</div>
+                                <div class="text-emerald-400 font-extrabold text-sm mt-0.5">99.6%</div>
+                            </div>
+                            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-sky-400 font-bold text-[11px]">Phase C</div>
+                                <div class="text-emerald-400 font-extrabold text-sm mt-0.5">99.7%</div>
+                            </div>
+                            <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-emerald-400 font-bold text-[11px]">Ground (G)</div>
+                                <div class="text-amber-400 font-extrabold text-sm mt-0.5">85.3%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Power System Physics Explanation Card -->
+                    <div class="clean-card p-5 space-y-3 border-l-4 border-amber-500">
+                        <div class="clean-title text-amber-400 text-sm">
+                            <span>⚡</span> Power System Physics: Why Symmetrical Grouping?
+                        </div>
+                        <div id="physics-explanation-content" class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- TAB 2: REAL-TIME TELEMETRY & MONGODB STREAM             -->
+        <!-- ======================================================== -->
+        <section id="tab-streaming" class="tab-section hidden space-y-4">
+            <div class="clean-card space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            <span>📡</span> Real-Time SCADA Telemetry & MongoDB Streaming Pipeline
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Simulated real-time streaming of line data (V, I) streamed into MongoDB, classified by the trained ANN, and stored back with millisecond timestamps.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center flex-wrap gap-2">
+                        <div id="stream-live-indicator" class="items-center gap-1.5 text-xs text-emerald-400 font-semibold" style="display: none;">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            STREAMING LIVE
+                        </div>
+                        <span id="mongo-doc-count" class="badge badge-green text-xs font-mono py-1 px-2.5">
+                            0 Docs in MongoDB
+                        </span>
+                        <button onclick="fetchMongoReadings()" class="btn-secondary py-1.5 px-3 text-xs flex items-center gap-1.5" title="Fetch latest documents stored in MongoDB">
+                            <span>🔄</span> Fetch from DB
+                        </button>
+                        <button onclick="clearMongoCollection()" class="btn-xs btn-outline py-1.5 px-2.5 text-xs text-rose-400 border-rose-500/40 hover:bg-rose-950/40" title="Delete all documents in fault_db.readings">
+                            <span>🗑</span> Clear DB
+                        </button>
+                        <select id="stream-mode-select" class="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded p-1.5 font-semibold">
+                            <option value="random">🎲 Random Stream (Balanced Mix of All Faults)</option>
+                            <option value="sequential">🔄 Interleaved Sequence (No Fault ➔ LG ➔ LL ➔ LLG ➔ LLL)</option>
+                            <option value="faults_only">⚡ Faults Only (Random Short Circuits)</option>
+                        </select>
+                        <select id="stream-speed-select" class="bg-slate-900 border border-slate-700 text-slate-300 text-xs rounded p-1.5">
+                            <option value="1000">1 Reading / sec (1 Hz)</option>
+                            <option value="500">2 Readings / sec (2 Hz)</option>
+                            <option value="200">5 Readings / sec (5 Hz)</option>
+                        </select>
+                        <button id="btn-toggle-stream" class="btn-primary py-1.5 px-3 flex items-center gap-1.5 text-xs">
+                            ▶ Start Telemetry Streaming
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid of Live Telemetry Table and MongoDB JSON Document -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 mt-3">
+                    <!-- Telemetry Table (8 cols) -->
+                    <div class="lg:col-span-8 overflow-x-auto">
+                        <table class="w-full text-left border-collapse font-mono text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-[11px] text-slate-400 uppercase">
+                                    <th class="py-2 px-2.5">Time</th>
+                                    <th class="py-2 px-2">Ia</th>
+                                    <th class="py-2 px-2">Ib</th>
+                                    <th class="py-2 px-2">Ic</th>
+                                    <th class="py-2 px-2">Va</th>
+                                    <th class="py-2 px-2">Vb</th>
+                                    <th class="py-2 px-2">Vc</th>
+                                    <th class="py-2 px-2.5">Predicted</th>
+                                    <th class="py-2 px-2">Actual</th>
+                                    <th class="py-2 px-2 text-right">Latency</th>
+                                    <th class="py-2 px-2 text-center">Match</th>
+                                </tr>
+                            </thead>
+                            <tbody id="telemetry-table-body">
+                                <tr>
+                                    <td colspan="11" class="text-center py-8 text-xs text-slate-500">
+                                        Click "Start Telemetry Streaming" to simulate live MongoDB streaming.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- MongoDB Document Live Inspector (4 cols) -->
+                    <div class="lg:col-span-4 bg-slate-950 p-3.5 rounded-xl border border-slate-800 font-mono text-xs">
+                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                            <span>📦 MongoDB Document Store</span>
+                            <span class="text-emerald text-[11px]">fault_db.readings</span>
+                        </div>
+                        <pre id="mongo-doc-viewer" class="text-slate-300 text-[11px] leading-relaxed overflow-x-auto max-h-[360px]">
+{
+  "status": "Awaiting streaming telemetry..."
+}
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- TAB 3: CLASSROOM PRESENTATION LECTURE SLIDES            -->
+        <!-- ======================================================== -->
+        <section id="tab-slides" class="tab-section hidden space-y-4">
+            
+            <!-- Slide Navigation Bar -->
+            <div class="clean-card flex items-center justify-between py-2.5 px-4">
+                <div class="flex items-center flex-wrap gap-1.5">
+                    <button class="slide-nav-pill active text-xs py-1 px-2.5" onclick="goToSlide(1)">1. Introduction</button>
+                    <button class="slide-nav-pill text-xs py-1 px-2.5" onclick="goToSlide(2)">2. Dataset & Workflow</button>
+                    <button class="slide-nav-pill text-xs py-1 px-2.5" onclick="goToSlide(3)">3. ANN Architecture</button>
+                    <button class="slide-nav-pill text-xs py-1 px-2.5" onclick="goToSlide(4)">4. Results & Discovery</button>
+                    <button class="slide-nav-pill text-xs py-1 px-2.5" onclick="goToSlide(5)">5. Real-Time MongoDB</button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span id="slide-counter-badge" class="text-xs text-slate-400 font-mono">Slide 1 of 5</span>
+                    <button class="btn-secondary text-xs py-1 px-2.5" onclick="prevSlide()">◀ Prev</button>
+                    <button class="btn-primary text-xs py-1 px-2.5" onclick="nextSlide()">Next ▶</button>
+                </div>
+            </div>
+
+            <!-- Slide 1 -->
+            <div class="slide-page clean-card p-6 min-h-[380px] space-y-4">
+                <div class="border-b border-slate-800 pb-3">
+                    <span class="brand-badge mb-1.5 text-[10px]">Department of Electrical and Electronics Engineering, NIT Puducherry</span>
+                    <h2 class="text-xl font-bold text-white">Real-Time Transmission Line Fault Detection & Classification using ANN</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Presented by: Lalith (EE24B1030), Prabhat (EE24B1041), Vamsi (EE24B1040)</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+                    <div class="space-y-2.5">
+                        <h3 class="font-bold text-sky-400 text-sm">The Engineering Problem</h3>
+                        <p>
+                            Transmission lines span vast geographical areas and are constantly vulnerable to severe environmental disturbances like lightning strikes, falling tree limbs, and insulation degradation.
+                        </p>
+                        <p>
+                            Traditional distance relays rely on static impedance thresholds, which can be deceived by fault resistance, dynamic grid loading, and measurement noise.
+                        </p>
+                    </div>
+                    <div class="space-y-2.5 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                        <h3 class="font-bold text-emerald-400 text-sm">Soft Computing Solution</h3>
+                        <p>
+                            We apply an <strong>Artificial Neural Network (Multilayer Perceptron)</strong> that directly processes instantaneous 3-phase currents (<span class="text-sky-300 font-mono">Ia, Ib, Ic</span>) and voltages (<span class="text-amber-300 font-mono">Va, Vb, Vc</span>).
+                        </p>
+                        <ul class="space-y-1 text-slate-300 list-disc list-inside">
+                            <li>Sub-cycle fault classification in under <strong>0.5 milliseconds</strong>.</li>
+                            <li>Instant trip commands for substation circuit breakers.</li>
+                            <li>Integrated real-time telemetry streaming via MongoDB.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide-page clean-card p-6 min-h-[380px] space-y-4" style="display:none;">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-xl font-bold text-white">Dataset & Preprocessing Pipeline</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Electrical Fault Detection and Classification Dataset (7,861 Samples)</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
+                        <div class="text-sky-400 font-bold text-xs mb-1.5 uppercase">Input Features (6)</div>
+                        <ul class="space-y-1 text-slate-300">
+                            <li><code class="text-rose-400">Ia</code>: Phase A current (Amperes)</li>
+                            <li><code class="text-yellow-400">Ib</code>: Phase B current (Amperes)</li>
+                            <li><code class="text-sky-400">Ic</code>: Phase C current (Amperes)</li>
+                            <li><code class="text-rose-400">Va</code>: Phase A voltage (p.u.)</li>
+                            <li><code class="text-yellow-400">Vb</code>: Phase B voltage (p.u.)</li>
+                            <li><code class="text-sky-400">Vc</code>: Phase C voltage (p.u.)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
+                        <div class="text-amber-400 font-bold text-xs mb-1.5 uppercase">Target Fault Classes</div>
+                        <ul class="space-y-1 text-slate-300">
+                            <li><strong>No Fault</strong>: Balanced continuous load</li>
+                            <li><strong>LG (A-G)</strong>: Single Line-to-Ground</li>
+                            <li><strong>LL (B-C)</strong>: Line-to-Line</li>
+                            <li><strong>LLG (A-B-G)</strong>: Double Line-to-Ground</li>
+                            <li><strong>LLL (A-B-C)</strong>: 3-Phase Symmetrical</li>
+                            <li><strong>LLLG (A-B-C-G)</strong>: 3-Phase with Ground</li>
+                        </ul>
+                    </div>
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
+                        <div class="text-emerald-400 font-bold text-xs mb-1.5 uppercase">StandardScaler Scaling</div>
+                        <p class="text-slate-300 leading-relaxed">
+                            Current magnitudes reach $\pm 1000\text{ A}$ while voltages stay within $\pm 0.6\text{ p.u.}$. Standard scaling is mandatory:
+                        </p>
+                        <div class="bg-slate-950 p-2 rounded mt-2 font-mono text-center text-sky-300 text-xs">
+                            z = (x - μ) / σ
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3 -->
+            <div class="slide-page clean-card p-6 min-h-[380px] space-y-4" style="display:none;">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-xl font-bold text-white">Multilayer Perceptron (MLP) Neural Network</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Architecture, Non-Linear Activations & Backpropagation Training</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+                    <div class="space-y-2">
+                        <h3 class="font-bold text-sky-400 text-sm">Layer Architecture</h3>
+                        <ul class="space-y-1.5">
+                            <li class="bg-slate-900 p-2 rounded border border-slate-800">
+                                <strong>Input Layer:</strong> 6 Neurons (Normalized Ia, Ib, Ic, Va, Vb, Vc).
+                            </li>
+                            <li class="bg-slate-900 p-2 rounded border border-slate-800">
+                                <strong>Hidden Layer 1:</strong> 32 Neurons with <strong>ReLU</strong> non-linearity ($a = \max(0, z)$).
+                            </li>
+                            <li class="bg-slate-900 p-2 rounded border border-slate-800">
+                                <strong>Hidden Layer 2:</strong> 16 Neurons with <strong>ReLU</strong> for cross-phase correlations.
+                            </li>
+                            <li class="bg-slate-900 p-2 rounded border border-slate-800">
+                                <strong>Output Layer:</strong> Softmax activation for probability distribution.
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="space-y-2 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+                        <h3 class="font-bold text-amber-400 text-sm">Why Soft Computing Excels</h3>
+                        <p class="leading-relaxed">
+                            Unlike rigid hard-coded relay trip settings, the ANN naturally accommodates fault resistance variations, inception angle differences, and harmonics without recalibration.
+                        </p>
+                        <div class="bg-slate-950 p-2.5 rounded font-mono text-emerald-400 font-bold text-xs mt-2">
+                            Inference Time: ~0.45 ms (Well within 20 ms sub-cycle requirements)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4 -->
+            <div class="slide-page clean-card p-6 min-h-[380px] space-y-4" style="display:none;">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-xl font-bold text-white">Experimental Results & Symmetrical Fault Discovery</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Deep-Dive into Electrical Engineering Physics & Model Accuracy</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-center">
+                        <div class="text-slate-400">Baseline 6-Class Model</div>
+                        <div class="text-2xl font-extrabold text-amber-400 my-1.5">85.19%</div>
+                        <p class="text-[10px] text-slate-400">Confuses LLL vs LLLG due to ground current cancellation.</p>
+                    </div>
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-center">
+                        <div class="text-slate-400">IEEE 5-Class Relay Model</div>
+                        <div class="text-2xl font-extrabold text-emerald-400 my-1.5">99.55%</div>
+                        <p class="text-[10px] text-slate-400">Groups 3-phase symmetrical short circuits. Flawless accuracy.</p>
+                    </div>
+                    <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 text-center">
+                        <div class="text-slate-400">Conductor Localization</div>
+                        <div class="text-2xl font-extrabold text-sky-400 my-1.5">99.8%</div>
+                        <p class="text-[10px] text-slate-400">Phases A, B, C detected with near 100% precision.</p>
+                    </div>
+                </div>
+                <div class="bg-amber-950/20 p-3 rounded-xl border border-amber-500/30 text-xs text-slate-300">
+                    <strong class="text-amber-400">The Power Systems Discovery:</strong> In a balanced 3-phase fault, $\sum I = I_a + I_b + I_c = 0$, so no ground current flows regardless of ground connection. Categorizing faults according to IEEE protective relay standards achieves <strong>99.55% accuracy</strong>.
+                </div>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide-page clean-card p-6 min-h-[380px] space-y-4" style="display:none;">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-xl font-bold text-white">Real-Time MongoDB Streaming & Future Scope</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Live Telemetry Pipeline & Substation Edge Implementation</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <h3 class="font-bold text-sky-400 text-sm">MongoDB SCADA Integration</h3>
+                        <p>
+                            Simulated real-time streaming pushes timestamped line telemetry into the <code class="text-sky-300">fault_db.readings</code> MongoDB collection.
+                        </p>
+                        <p>
+                            The ANN predicts the fault in real time and writes back the diagnosis. Circuit breakers receive a trip pulse in <strong>11.8 ms</strong>.
+                        </p>
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-2">
+                        <h3 class="font-bold text-emerald-400 text-sm">Conclusion & Future Work</h3>
+                        <p>
+                            We demonstrated a complete end-to-end Soft Computing pipeline combining ANN intelligence, real-time database streaming, and animated explainability.
+                        </p>
+                        <p>
+                            <strong>Future Scope:</strong> Time-series deep learning (LSTM, 1D-CNN) and IEC 61850 substation microcontroller deployment.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- TAB 4: PROJECT PROPOSAL SPECS & WORKFLOW                -->
+        <!-- ======================================================== -->
+        <section id="tab-proposal" class="tab-section hidden space-y-4">
+            <div class="clean-card space-y-4">
+                <div class="border-b border-slate-800 pb-3">
+                    <span class="brand-badge mb-1 text-[10px]">Department of Electrical and Electronics Engineering, NIT Puducherry</span>
+                    <h2 class="text-lg font-bold text-white">Project Proposal & System Workflow Specification</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Course: Soft Computing Assignment | NIT Puducherry</p>
+                </div>
+
+                <!-- Team Grid -->
+                <div>
+                    <h3 class="text-xs font-bold text-sky-400 mb-2 uppercase tracking-wider">Project Team Members</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
+                            <div class="font-bold text-white text-sm">Lalith</div>
+                            <div class="text-slate-400 font-mono text-[11px] mt-0.5">Roll: EE24B1030</div>
+                            <div class="text-sky-400 mt-1.5">Data Preprocessing & Streaming Architecture</div>
+                        </div>
+                        <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
+                            <div class="font-bold text-white text-sm">Prabhat</div>
+                            <div class="text-slate-400 font-mono text-[11px] mt-0.5">Roll: EE24B1041</div>
+                            <div class="text-amber-400 mt-1.5">ANN Modeling & Hyperparameter Optimization</div>
+                        </div>
+                        <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800">
+                            <div class="font-bold text-white text-sm">Vamsi</div>
+                            <div class="text-slate-400 font-mono text-[11px] mt-0.5">Roll: EE24B1040</div>
+                            <div class="text-emerald-400 mt-1.5">Real-time Visualization & Evaluation Metrics</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Workflow Diagram -->
+                <div>
+                    <h3 class="text-xs font-bold text-sky-400 mb-2 uppercase tracking-wider">System Workflow Architecture</h3>
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs text-center">
+                        <div class="bg-sky-950/60 border border-sky-500/40 p-2.5 rounded-lg flex-1 min-w-[110px]">
+                            <div class="font-bold text-sky-400">1. Line Data (V, I)</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">3-Phase Telemetry</div>
+                        </div>
+                        <div class="text-slate-500 font-bold">➔</div>
+                        <div class="bg-indigo-950/60 border border-indigo-500/40 p-2.5 rounded-lg flex-1 min-w-[110px]">
+                            <div class="font-bold text-indigo-400">2. MongoDB Storage</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">Streaming Collection</div>
+                        </div>
+                        <div class="text-slate-500 font-bold">➔</div>
+                        <div class="bg-purple-950/60 border border-purple-500/40 p-2.5 rounded-lg flex-1 min-w-[110px]">
+                            <div class="font-bold text-purple-400">3. Preprocessing</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">StandardScaler (z-score)</div>
+                        </div>
+                        <div class="text-slate-500 font-bold">➔</div>
+                        <div class="bg-amber-950/60 border border-amber-500/40 p-2.5 rounded-lg flex-1 min-w-[110px]">
+                            <div class="font-bold text-amber-400">4. ANN Model</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">Multilayer Perceptron</div>
+                        </div>
+                        <div class="text-slate-500 font-bold">➔</div>
+                        <div class="bg-rose-950/60 border border-rose-500/40 p-2.5 rounded-lg flex-1 min-w-[110px]">
+                            <div class="font-bold text-rose-400">5. Fault Type & Alert</div>
+                            <div class="text-slate-400 text-[10px] mt-0.5">Relay Trip Command</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Scripts -->
+    <script src="model_data.js"></script>
+    <script src="neural_net_viz.js"></script>
+    <script src="power_viz.js"></script>
+    <script src="app.js?v=3"></script>
+</body>
+</html>

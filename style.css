@@ -1,0 +1,597 @@
+/* Modern SCADA Control Room & Academic Theme for Transmission Fault Detection */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --bg-main: #090d16;
+    --bg-card: rgba(15, 23, 42, 0.75);
+    --bg-card-border: rgba(51, 65, 85, 0.6);
+    --bg-header: rgba(10, 15, 29, 0.88);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --cyan: #38bdf8;
+    --cyan-glow: rgba(56, 189, 248, 0.35);
+    --amber: #f59e0b;
+    --amber-glow: rgba(245, 158, 11, 0.35);
+    --crimson: #ef4444;
+    --crimson-glow: rgba(239, 68, 68, 0.35);
+    --emerald: #10b981;
+    --emerald-glow: rgba(16, 185, 129, 0.35);
+    --phase-a: #ef4444;
+    --phase-b: #eab308;
+    --phase-c: #38bdf8;
+    --phase-g: #10b981;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-main);
+    background-image: 
+        radial-gradient(at 10% 20%, rgba(14, 165, 233, 0.08) 0px, transparent 50%),
+        radial-gradient(at 90% 80%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    line-height: 1.5;
+    overflow-x: hidden;
+}
+
+/* Glassmorphism Header */
+header {
+    background: var(--bg-header);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--bg-card-border);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 0.85rem 1.5rem;
+}
+
+.brand-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(14, 165, 233, 0.15);
+    color: var(--cyan);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.team-pill {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #cbd5e1;
+    transition: all 0.2s ease;
+}
+.team-pill:hover {
+    border-color: var(--cyan);
+    background: rgba(14, 165, 233, 0.15);
+    transform: translateY(-1px);
+}
+.team-pill strong {
+    color: var(--text-primary);
+}
+
+/* Nav Tabs */
+.nav-tab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 0.6rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+.nav-tab-btn:hover {
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.04);
+}
+.nav-tab-btn.active {
+    color: var(--cyan);
+    background: rgba(14, 165, 233, 0.14);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Glass Card */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--bg-card-border);
+    border-radius: 14px;
+    padding: 1.25rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.2s ease;
+}
+.glass-card:hover {
+    border-color: rgba(100, 116, 139, 0.7);
+}
+
+.card-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.85rem;
+    letter-spacing: -0.01em;
+}
+
+/* Hero Prediction Result Badge */
+.fault-hero-badge {
+    display: inline-block;
+    padding: 0.45rem 1.2rem;
+    border-radius: 10px;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+.fault-hero-badge.healthy {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1.5px solid rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 20px var(--emerald-glow);
+}
+.fault-hero-badge.faulted {
+    background: rgba(239, 68, 68, 0.18);
+    color: #f87171;
+    border: 1.5px solid rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 25px var(--crimson-glow);
+    animation: pulseFault 1.8s infinite;
+}
+
+@keyframes pulseFault {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--crimson-glow); }
+    50% { transform: scale(1.02); box-shadow: 0 0 32px rgba(239, 68, 68, 0.6); }
+}
+
+/* Input Controls */
+.slider-group {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.4);
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+    transition: border-color 0.2s;
+}
+.slider-group:hover {
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    border-radius: 3px;
+    background: #334155;
+    outline: none;
+    cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--cyan);
+    cursor: pointer;
+    box-shadow: 0 0 8px var(--cyan-glow);
+    transition: transform 0.15s;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.25);
+}
+
+input[type="number"] {
+    background: #0f172a;
+    border: 1px solid #334155;
+    color: #f8fafc;
+    border-radius: 6px;
+    padding: 0.2rem 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    width: 75px;
+    text-align: right;
+}
+input[type="number"]:focus {
+    outline: none;
+    border-color: var(--cyan);
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
+    transition: all 0.2s;
+}
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(14, 165, 233, 0.45);
+}
+
+.btn-secondary {
+    background: #1e293b;
+    border: 1px solid #475569;
+    color: #e2e8f0;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-secondary:hover {
+    background: #334155;
+    border-color: #64748b;
+}
+
+.btn-preset {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(71, 85, 105, 0.5);
+    color: #cbd5e1;
+    padding: 0.4rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.btn-preset:hover {
+    background: rgba(14, 165, 233, 0.15);
+    border-color: var(--cyan);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.btn-xs {
+    padding: 0.25rem 0.55rem;
+    font-size: 0.72rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--cyan);
+    color: var(--cyan);
+}
+.btn-outline:hover {
+    background: rgba(14, 165, 233, 0.15);
+}
+.btn-disabled {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #64748b;
+    cursor: default;
+}
+
+/* Breaker Badge */
+.breaker-badge {
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    letter-spacing: 0.03em;
+}
+.breaker-closed {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+.breaker-tripped {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.status-dot.green { background: #10b981; box-shadow: 0 0 8px #10b981; }
+.status-dot.red { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+
+.status-pill {
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.status-pill.online {
+    background: rgba(16, 185, 129, 0.15);
+    color: #34d399;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.status-pill.simulated {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+.status-pill.client-only {
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+/* Tooltip for Neural Network Canvas */
+#nn-tooltip {
+    position: fixed;
+    background: rgba(15, 23, 42, 0.94);
+    border: 1px solid var(--cyan);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    color: #f8fafc;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    z-index: 100;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    backdrop-filter: blur(8px);
+}
+
+/* Arc Flash Graphic */
+.arc-flash {
+    position: absolute;
+    width: 28px;
+    height: 48px;
+    background: radial-gradient(circle, #fff, #38bdf8 60%, transparent 80%);
+    border-radius: 50%;
+    filter: blur(2px);
+    animation: sparkFlicker 0.15s infinite alternate;
+    pointer-events: none;
+}
+@keyframes sparkFlicker {
+    0% { transform: scale(1) rotate(0deg); opacity: 0.85; }
+    100% { transform: scale(1.3) rotate(15deg); opacity: 1; }
+}
+
+/* Slides Navigation */
+.slide-nav-pill {
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.slide-nav-pill:hover {
+    color: #f8fafc;
+    background: rgba(51, 65, 85, 0.6);
+}
+.slide-nav-pill.active {
+    background: rgba(14, 165, 233, 0.2);
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+/* Utility Text Colors */
+.text-cyan { color: var(--cyan); }
+.text-amber { color: var(--amber); }
+.text-crimson { color: var(--crimson); }
+.text-emerald { color: var(--emerald); }
+
+.badge {
+    display: inline-block;
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+.badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.badge-red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+.badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* ========================================================
+   Clean Executive Presentation Studio Enhancements
+   ======================================================== */
+
+.clean-card {
+    background: rgba(15, 23, 42, 0.82);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(51, 65, 85, 0.55);
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.35);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.clean-card:hover {
+    border-color: rgba(100, 116, 139, 0.7);
+}
+
+.clean-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+}
+
+/* Segmented Control Pills */
+.tab-pill {
+    padding: 0.25rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 6px;
+    background: rgba(30, 41, 59, 0.7);
+    color: #94a3b8;
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.tab-pill:hover {
+    color: #f8fafc;
+    background: rgba(51, 65, 85, 0.7);
+}
+.tab-pill.active {
+    background: rgba(14, 165, 233, 0.22);
+    color: var(--cyan);
+    border-color: rgba(56, 189, 248, 0.45);
+    font-weight: 700;
+}
+
+/* Confusion Matrix Active Cell Pulse */
+.cm-active-cell {
+    outline: 2px solid #f59e0b !important;
+    outline-offset: -1px;
+    background: rgba(245, 158, 11, 0.28) !important;
+    color: #fef08a !important;
+    font-weight: 900 !important;
+    transform: scale(1.06);
+    z-index: 10;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.4);
+}
+
+/* Preset Action Buttons */
+.preset-btn {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(51, 65, 85, 0.6);
+    border-radius: 8px;
+    padding: 0.45rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.45rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+}
+.preset-btn:hover {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(100, 116, 139, 0.8);
+    transform: translateY(-1px);
+}
+.preset-btn.active-preset {
+    background: rgba(14, 165, 233, 0.2) !important;
+    border-color: var(--cyan) !important;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+    color: #fff !important;
+}
+
+/* Compact Slider Groups */
+.slider-compact {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.45);
+    border-radius: 7px;
+    padding: 0.4rem 0.6rem;
+}
+.slider-compact:hover {
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+/* Spacious Presentation Cards with Comfortable Breathing Space */
+.clean-card-spacious {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(51, 65, 85, 0.6);
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.45);
+}
+
+/* Three-Phase Waveform & Phasor Analyzer Section Highlighting */
+.analyzer-card {
+    background: rgba(13, 20, 36, 0.92);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.12);
+}
+
+.scope-canvas-box {
+    background: radial-gradient(ellipse at center, rgba(14, 23, 42, 0.95), rgba(7, 11, 20, 0.98));
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.75), 0 0 18px rgba(56, 189, 248, 0.15);
+}
+
+.phasor-canvas-box {
+    background: radial-gradient(circle at center, rgba(15, 23, 42, 0.95), rgba(7, 11, 20, 0.98));
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow: inset 0 0 24px rgba(0, 0, 0, 0.75), 0 0 18px rgba(56, 189, 248, 0.15);
+}
+
+.hud-pill {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(71, 85, 105, 0.6);
+    border-radius: 9999px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
